@@ -30,13 +30,14 @@ func ReadTSV(target string) {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	fmt.Println("Reading data took ",time.Since(start))
+	elasped:=time.Since(start)
 	count := 0
 	 //fmt.Println(csvData)
 	for _, each := range csvData {
 		fmt.Println(each[0], " ", each[1], " ", each[2])
 		count = count + 1
 	}
-	fmt.Println("total: ", count)
+	fmt.Println("Reading data took ",elasped)
+	fmt.Println("Printing ", count," data took ",time.Since(start))
 	
 }
