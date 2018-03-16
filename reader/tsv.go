@@ -7,7 +7,6 @@ import (
 	"time"
 	"strconv"
 	"encoding/json"
-	_"encoding/xml"
 	"io/ioutil"
 	"github.com/ashik112/goimdb/model"
 )
@@ -45,10 +44,7 @@ func WriteTitleBasics(csvData [][]string){
 /*WriteRatings does ...*/
 func WriteRatings(csvData [][]string){
 	start:=time.Now()
-
-	//var ratings []Ratings
 	ratings:=make([]model.Ratings,len(csvData))
-	//count:=0
 	for index, each := range csvData {
 		
 		avgRating,_:=strconv.ParseFloat(each[1],64)
