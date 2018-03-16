@@ -1,6 +1,4 @@
 package model
-
-
 type AverageRating struct{
 	Set float64 `json:"set"`
 }
@@ -31,12 +29,6 @@ type RunTimeMinutes struct{
 type Genres struct{
 	Set string `json:"set"`
 }
-/*Ratings does..*/
-// type Ratings struct{
-//     ID string  `json:"id"`
-//     AverageRating AverageRating  `json:"averageRating"`
-// 	NumVotes NumVotes `json:"numVotes"`
-// }
 type Ratings struct{
     ID string  `json:"id"`
     AverageRating AverageRating  `json:"averageRating"`
