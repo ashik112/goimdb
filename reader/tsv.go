@@ -1,6 +1,7 @@
 package reader
 
 import (
+	"strings"
 	"encoding/csv"
 	"fmt"
 	"os"
@@ -61,23 +62,93 @@ func WriteRatings(csvData [][]string){
 		fmt.Println(err)
 	}
 }
+/*WriteRatings does ...*/
+func WriteCrew(csvData [][]string){
+	start:=time.Now()
 
+	data:=make([][3]interface{},len(csvData))
+	for index, each := range csvData {
+	   data[index][0]=each[0]
+	   data[index][1]=strings.Split(each[1],",")
+	   data[index][2]=strings.Split(each[2],",")
+   }
+	crew:=make([]model.Crew,len(csvData))
+	for index, each := range data {		
+		crew[index].ID= each[0]
+		crew[index].Directors.Set= each[1]		
+		crew[index].Writers.Set=each[2]
+	}
+	fmt.Println("Processing ", len(csvData)," data took ",time.Since(start))
+	crew=crew[1:]
+	cnv,_:=json.Marshal(crew)
+	err := ioutil.WriteFile("./files/decompressed/title.crew.json", cnv, 0644)
+	if err!=nil{
+		fmt.Println(err)
+	}
+}
+func WriteNameBasics(csvData [][]string){
+	start:=time.Now()
+	
+	data:=make([][6]interface{},len(csvData))
+	//data=csvData
+	count:=0
+	for index, each := range csvData {
+		count++
+		if count==len(csvData)-2{
+			break
+		}
+	    data[index][0]=each[0]
+	    data[index][1]=each[1]
+	    birthYear,_:=strconv.ParseInt(each[2],0,64)
+	    deathYear,_:=strconv.ParseInt(each[3],0,64)
+	    data[index][2]=birthYear
+	    data[index][3]=deathYear
+	    data[index][4]=strings.Split(each[4],",")
+	    data[index][5]=strings.Split(each[5],",")
+   }
+	items:=make([]model.NameBasics,len(data))
+	for index, each := range data {		
+		items[index].ID= each[0]
+		items[index].PrimaryName.Set= each[1]		
+		items[index].BirthYear.Set=each[2]
+		items[index].DeathYear.Set=each[3]
+		items[index].PrimaryProfession.Set=each[4]
+		items[index].KnownForTitles.Set=each[5]
+	}
+	fmt.Println("Processing ", len(csvData)," data took ",time.Since(start))
+	items=items[1:]
+	cnv,_:=json.Marshal(items)
+	err := ioutil.WriteFile("./files/decompressed/name.basics.json", cnv, 0644)
+	if err!=nil{
+		fmt.Println(err)
+	}
+}
+func PrintData(csvData [][]string){
+	fmt.Println(csvData[4499257][0])
+	// data:=make([][3]interface{},len(csvData))
+	// count:=0
+	// for index,_ := range csvData {
+	// 	// fmt.Println(index)
+	// 	count++
+	// }
+	// fmt.Println(csvData[4499257][0])
+	// for i:=0;i<20;i++{
+	// 	fmt.Println(data[i])
+	// }
+}
 /*ReadTSV does ...*/
 func ReadTSV(target string) {
 	start:=time.Now()
 	csvFile, err := os.Open(target)
-
 	if err != nil {
 		fmt.Println(err)
 	}
-
 	defer csvFile.Close()
 
 	reader := csv.NewReader(csvFile)
-
 	reader.Comma = '\t' // Use tab-delimited instead of comma <---- here!
 	reader.LazyQuotes = true
-	 reader.FieldsPerRecord = -1
+	reader.FieldsPerRecord = -1
 
 	fmt.Println("Reading Data from file...")
 	csvData, err := reader.ReadAll()	
@@ -88,8 +159,11 @@ func ReadTSV(target string) {
 	elasped:=time.Since(start)
 
 	//WriteRatings(csvData)
-	WriteTitleBasics(csvData)
-
+	// WriteTitleBasics(csvData)
+	//  WriteCrew(csvData)
+	 WriteNameBasics(csvData)
+	// PrintData(csvData)
+	// fmt.Println(csvData[4499257])
 	fmt.Println("Reading data took ",elasped)
 	fmt.Println("Data length: ",len(csvData))
 	
