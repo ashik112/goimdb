@@ -1,14 +1,29 @@
 package model
-type AverageRating struct{
-	Set float64 `json:"zset"`
-}
-type NumVotes struct{
-	Set int64 `json:"set"`
-}
+
+/*Ratings ...*/
 type Ratings struct{
     ID string  `json:"id"`
     AverageRating AverageRating  `json:"averageRating"`
 	NumVotes NumVotes `json:"numVotes"`
+}
+type AverageRating struct{
+	Set float64 `json:"set"`
+}
+type NumVotes struct{
+	Set int64 `json:"set"`
+}
+
+/*TitleBasics ...*/
+type TitleBasics struct{
+    ID string  `json:"id"`
+	TitleType TitleType `json:"titleType"`
+	PrimaryTitle PrimaryTitle `json:"primaryTitle"`
+	OriginalTitle OriginalTitle `json:"originalTitle"`
+	IsAdult IsAdult `json:"isAdult"`
+	StartYear StartYear `json:"startYear"`
+	EndYear EndYear `json:"endYear"`
+	RunTimeMinutes RunTimeMinutes `json:"runtimeMinutes"`
+	Genres Genres `json:"genres"`
 }
 type TitleType struct{
 	Set string `json:"set"`
@@ -34,18 +49,8 @@ type RunTimeMinutes struct{
 type Genres struct{
 	Set interface{} `json:"set"`
 }
-/*TitleBasics does..*/
-type TitleBasics struct{
-    ID string  `json:"id"`
-	TitleType TitleType `json:"titleType"`
-	PrimaryTitle PrimaryTitle `json:"primaryTitle"`
-	OriginalTitle OriginalTitle `json:"originalTitle"`
-	IsAdult IsAdult `json:"isAdult"`
-	StartYear StartYear `json:"startYear"`
-	EndYear EndYear `json:"endYear"`
-	RunTimeMinutes RunTimeMinutes `json:"runtimeMinutes"`
-	Genres Genres `json:"genres"`
-}
+
+/*Crew ...*/
 type Crew struct{
     ID interface{}  `json:"id"`
     Directors Directors  `json:"directors"`
@@ -57,6 +62,8 @@ type Directors struct{
 type Writers struct{
 	Set interface{} `json:"set"`
 }
+
+/*TitleEpisode ...*/
 type TitleEpisode struct{
 	ID string `json:"id"`
     Parent Parent  `json:"parentID"`
@@ -73,6 +80,7 @@ type EpisodeNumber struct{
 	Set string `json:"set"`
 }
 
+/*TitlePrincipals ...*/
 type TitlePrincipals struct{
 	ID interface{}  `json:"id"`
     PrincipalCast PrincipalCast  `json:"principalCast"`
@@ -81,6 +89,7 @@ type PrincipalCast struct{
 	Set interface{} `json:"set"`
 }
 
+/*NameBasics ...*/
 type NameBasics struct{
 	ID interface{}  `json:"id"`
     PrimaryName PrimaryName  `json:"primaryName"`
