@@ -94,7 +94,7 @@ DownloadFiles() and GetFiles() have to be uncommented in main.go. In ReadFile() 
 In Solr, a core needs be created and field names should be manually created for goimdb to work. The following command will insert/update Solr database at core "imdb".
 
 ```sh
-$ curl 'http://localhost:8983/solr/imdb/update?commit=true' -H 'Content-type:application/json' --data-binary $GOPATH/src/github.com/ashik112/goimdb/files/decompressed/title.ratings.json
+$ curl 'http://localhost:8983/solr/imdb/update?commit=true' -H 'Content-type:application/json' --data-binary @title.ratings.json
 ```
 Most of the process will be automated in the future.
 
