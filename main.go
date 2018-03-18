@@ -50,14 +50,15 @@ func GetFiles(){
 
 /*ReadFile does..*/
 func ReadFile(){
-    // reader.ReadTSV("./files/decompressed/title.ratings.tsv")
-    // reader.ReadTSV("./files/decompressed/title.crew.tsv")
-    // reader.ReadTSV("./files/decompressed/title.crew.tsv")
-    reader.ReadTSV("./files/decompressed/name.basics.tsv")
+    directory:="./files/decompressed/"
+    reader.ReadTSV(directory,"title.ratings.tsv")
+    // reader.ReadTSV(directory,"title.basics.tsv")
+    // reader.ReadTSV(directory,"title.crew.tsv")
+    // reader.ReadTSV(directory,"name.basics.tsv")
 }
 
 func main() {
     // DownloadFiles()
     // GetFiles()
-  ReadFile()    
+      ReadFile()    
 }
