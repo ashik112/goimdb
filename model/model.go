@@ -1,115 +1,132 @@
 package model
 
 /*Ratings ...*/
-type Ratings struct{
-    ID string  `json:"id"`
-    AverageRating AverageRating  `json:"averageRating"`
-	NumVotes NumVotes `json:"numVotes"`
+type Ratings struct {
+	ID            string        `json:"id"`
+	AverageRating AverageRating `json:"averageRating"`
+	NumVotes      NumVotes      `json:"numVotes"`
 }
-type AverageRating struct{
+type AverageRating struct {
 	Set float64 `json:"set"`
 }
-type NumVotes struct{
+type NumVotes struct {
 	Set int64 `json:"set"`
 }
 
 /*TitleBasics ...*/
-type TitleBasics struct{
-    ID string  `json:"id"`
-	TitleType TitleType `json:"titleType"`
-	PrimaryTitle PrimaryTitle `json:"primaryTitle"`
-	OriginalTitle OriginalTitle `json:"originalTitle"`
-	IsAdult IsAdult `json:"isAdult"`
-	StartYear StartYear `json:"startYear"`
-	EndYear EndYear `json:"endYear"`
+type TitleBasics struct {
+	ID             string         `json:"id"`
+	TitleType      TitleType      `json:"titleType"`
+	PrimaryTitle   PrimaryTitle   `json:"primaryTitle"`
+	OriginalTitle  OriginalTitle  `json:"originalTitle"`
+	IsAdult        IsAdult        `json:"isAdult"`
+	StartYear      StartYear      `json:"startYear"`
+	EndYear        EndYear        `json:"endYear"`
 	RunTimeMinutes RunTimeMinutes `json:"runtimeMinutes"`
-	Genres Genres `json:"genres"`
+	Genres         Genres         `json:"genres"`
 }
-type TitleType struct{
+type TitleType struct {
 	Set string `json:"set"`
 }
-type PrimaryTitle struct{
+type PrimaryTitle struct {
 	Set string `json:"set"`
 }
-type OriginalTitle struct{
+type OriginalTitle struct {
 	Set string `json:"set"`
 }
-type IsAdult struct{
+type IsAdult struct {
 	Set int64 `json:"set"`
 }
-type StartYear struct{
+type StartYear struct {
 	Set int64 `json:"set"`
 }
-type EndYear struct{
+type EndYear struct {
 	Set int64 `json:"set"`
 }
-type RunTimeMinutes struct{
+type RunTimeMinutes struct {
 	Set int64 `json:"set"`
 }
-type Genres struct{
+type Genres struct {
 	Set interface{} `json:"set"`
 }
 
 /*Crew ...*/
-type Crew struct{
-    ID interface{}  `json:"id"`
-    Directors Directors  `json:"directors"`
-	Writers Writers `json:"writers"`
+type Crew struct {
+	ID        interface{} `json:"id"`
+	Directors Directors   `json:"directors"`
+	Writers   Writers     `json:"writers"`
 }
-type Directors struct{
+type Directors struct {
 	Set interface{} `json:"set"`
 }
-type Writers struct{
+type Writers struct {
 	Set interface{} `json:"set"`
 }
 
 /*TitleEpisode ...*/
-type TitleEpisode struct{
-	ID string `json:"id"`
-    Parent Parent  `json:"parentID"`
-	SeasonNumber SeasonNumber `json:"seasonNumber"`
+type TitleEpisode struct {
+	ID            string        `json:"id"`
+	Parent        Parent        `json:"parentID"`
+	SeasonNumber  SeasonNumber  `json:"seasonNumber"`
 	EpisodeNumber EpisodeNumber `json:"episodeNumber"`
 }
-type Parent struct{
+type Parent struct {
 	Set string `json:"set"`
 }
-type SeasonNumber struct{
+type SeasonNumber struct {
 	Set string `json:"set"`
 }
-type EpisodeNumber struct{
+type EpisodeNumber struct {
 	Set string `json:"set"`
 }
 
 /*TitlePrincipals ...*/
-type TitlePrincipals struct{
-	ID string  `json:"id"`
-    PrincipalCast PrincipalCast  `json:"principalCast"`
+type TitlePrincipals struct {
+	ID         string     `json:"id"`
+	Ordering   Ordering   `json:"ordering"`
+	Cast       Cast       `json:"cast"`
+	Category   Category   `json:"category"`
+	Job        Job        `json:"job"`
+	Characters Characters `json:"characters"`
 }
-type PrincipalCast struct{
-	Set interface{} `json:"set"`
+
+type Ordering struct {
+	Set int64 `json:"set"`
+}
+type Cast struct {
+	Set string `json:"set"`
+}
+type Category struct {
+	Set string `json:"set"`
+}
+type Job struct {
+	Set string `json:"set"`
+}
+type Characters struct {
+	Set string `json:"set"`
 }
 
 /*NameBasics ...*/
-type NameBasics struct{
-	ID interface{}  `json:"id"`
-    PrimaryName PrimaryName  `json:"primaryName"`
-	BirthYear BirthYear `json:"birthYear"`
-	DeathYear DeathYear `json:"deathYear"`
+type NameBasics struct {
+	ID                interface{}       `json:"id"`
+	PrimaryName       PrimaryName       `json:"primaryName"`
+	BirthYear         BirthYear         `json:"birthYear"`
+	DeathYear         DeathYear         `json:"deathYear"`
 	PrimaryProfession PrimaryProfession `json:"primaryProfession"`
-	KnownForTitles KnownForTitles `json:"knownForTitles"`
+	KnownForTitles    KnownForTitles    `json:"knownForTitles"`
 }
-type PrimaryName struct{
+type PrimaryName struct {
 	Set interface{} `json:"set"`
 }
-type BirthYear struct{
+type BirthYear struct {
 	Set interface{} `json:"set"`
 }
-type DeathYear struct{
+type DeathYear struct {
 	Set interface{} `json:"set"`
 }
-type PrimaryProfession struct{
+type PrimaryProfession struct {
 	Set interface{} `json:"set"`
 }
-type KnownForTitles struct{
+type KnownForTitles struct {
 	Set interface{} `json:"set"`
 }
