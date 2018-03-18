@@ -82,7 +82,7 @@ type EpisodeNumber struct{
 
 /*TitlePrincipals ...*/
 type TitlePrincipals struct{
-	ID interface{}  `json:"id"`
+	ID string  `json:"id"`
     PrincipalCast PrincipalCast  `json:"principalCast"`
 }
 type PrincipalCast struct{

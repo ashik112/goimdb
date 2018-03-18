@@ -8,6 +8,7 @@ import (
 	"time"
 	"strconv"
 	"encoding/json"
+	"io"
 	"io/ioutil"
 	"github.com/ashik112/goimdb/model"
 )
@@ -29,7 +30,7 @@ func WriteTitleBasics(csvData [][]string){
 		titleBasics[index].StartYear.Set= startYear
 		titleBasics[index].EndYear.Set= endYear
 		titleBasics[index].RunTimeMinutes.Set= runtimeMinutes
-		titleBasics[index].Genres.Set= each[8]
+		titleBasics[index].Genres.Set= strings.Split(each[8],",")
 	}
 	fmt.Println("Processing ", len(csvData)," data took ",time.Since(start))
 	titleBasics=titleBasics[1:]
@@ -117,45 +118,84 @@ func WriteNameBasics(csvData [][]string){
 		fmt.Println(err)
 	}
 }
+/*WriteTitlePrincipals does ...*/
+func WriteTitlePrincipals(csvData [][]string){
+	start:=time.Now()
+	items:=make([]model.TitlePrincipals,len(csvData))
+	for index, each := range csvData {		
+		items[index].ID= each[0]
+		items[index].PrincipalCast.Set= strings.Split(each[1],",")
+	}
+	items=items[1:]
+	cnv,_:=json.Marshal(items)
+	err := ioutil.WriteFile("./files/json/title.principals.json", cnv, 0644)
+	if err!=nil{
+		fmt.Println(err)
+	}
+	fmt.Println("Total Process ", len(csvData)," data took ",time.Since(start))
+}
 /*PrintData does..*/
-func PrintData(csvData [][]string){
-
+func PrintData(path string){
+	f, err := os.Open(path)
+    if err != nil {
+        
+    }
+    defer f.Close()
+	data:=make(map[string][]interface{})
+	
+	csvr := csv.NewReader(f)
+	csvr.Comma = '\t' 
+	headers, err := csvr.Read()
+	if err==nil {
+		fmt.Println(headers);
+	}
+	for i:=0;i<10;i++{
+		row, err := csvr.Read()
+		if err == io.EOF {
+            break
+		}
+		data[row[0]]["ordering"]="fd"
+		fmt.Println(row[0], " ",row[1]," ", row[2]," ",row[3], " ",row[4])
+	}
 }
 /*ReadTSV does ...*/
 func ReadTSV(directory, target string) {
-	start:=time.Now()
-	csvFile, err := os.Open(directory+target)
-	if err != nil {
-		fmt.Println(err)
-	}
-	defer csvFile.Close()
+	PrintData(directory+target)
+	// start:=time.Now()
+	// csvFile, err := os.Open(directory+target)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
+	// defer csvFile.Close()
 
-	reader := csv.NewReader(csvFile)
-	reader.Comma = '\t' // Use tab-delimited instead of comma <---- here!
-	reader.LazyQuotes = true
-	reader.FieldsPerRecord = -1
+	// reader := csv.NewReader(csvFile)
+	// reader.Comma = '\t' 
+	// reader.LazyQuotes = true
+	// reader.FieldsPerRecord = -1
 
-	fmt.Println("Reading Data from file...")
-	csvData, err := reader.ReadAll()	
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-	elasped:=time.Since(start)
+	// fmt.Println("Reading Data from file...")
+	// csvData, err := reader.ReadAll()	
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	os.Exit(1)
+	// }
+	// elasped:=time.Since(start)
 
-
-	switch target {
-	case "name.basics.tsv":
-		WriteNameBasics(csvData)
-	case "title.ratings.tsv":
-		WriteRatings(csvData)
-	case "title.crew.tsv":
-		WriteCrew(csvData)
-	case "title.basics.tsv":
-		WriteTitleBasics(csvData)
-	default:
-		panic("Unexpected error: couldn't locate file")
-	}
-	fmt.Println("Reading data took ",elasped)
-	fmt.Println("Data length: ",len(csvData))
+	
+	// switch target {
+	// case "name.basics.tsv":
+	// 	WriteNameBasics(csvData)
+	// case "title.ratings.tsv":
+	// 	WriteRatings(csvData)
+	// case "title.crew.tsv":
+	// 	WriteCrew(csvData)
+	// case "title.basics.tsv":
+	// 	WriteTitleBasics(csvData)
+	// case "title.principals.tsv":
+	// 	WriteTitlePrincipals(csvData)
+	// default:
+	// 	panic("Unexpected error: couldn't locate file")
+	// }
+	// fmt.Println("Reading data took ",elasped)
+	// fmt.Println("Data length: ",len(csvData))
 }
