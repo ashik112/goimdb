@@ -15,10 +15,7 @@ import (
 /*WriteTitleBasics does ...*/
 func WriteTitleBasics(csvData [][]string){
 	start:=time.Now()
-
-	fmt.Println(len(csvData))
 	titleBasics:=make([]model.TitleBasics,len(csvData))
-
 	for index, each := range csvData {
 		titleBasics[index].ID= each[0]
 		titleBasics[index].TitleType.Set= each[1]
@@ -37,7 +34,7 @@ func WriteTitleBasics(csvData [][]string){
 	fmt.Println("Processing ", len(csvData)," data took ",time.Since(start))
 	titleBasics=titleBasics[1:]
 	cnv,_:=json.Marshal(titleBasics)
-	err := ioutil.WriteFile("./files/decompressed/title.basics.json", cnv, 0644)
+	err := ioutil.WriteFile("./files/json/title.basics.json", cnv, 0644)
 	if err!=nil{
 		fmt.Println(err)
 	}
@@ -47,7 +44,6 @@ func WriteRatings(csvData [][]string){
 	start:=time.Now()
 	ratings:=make([]model.Ratings,len(csvData))
 	for index, each := range csvData {
-		
 		avgRating,_:=strconv.ParseFloat(each[1],64)
 		votes,_:=strconv.ParseInt(each[2],0,64)
 		ratings[index].ID= each[0]
@@ -57,15 +53,14 @@ func WriteRatings(csvData [][]string){
 	fmt.Println("Processing ", len(csvData)," data took ",time.Since(start))
 	ratings=ratings[1:]
 	cnv,_:=json.Marshal(ratings)
-	err := ioutil.WriteFile("./files/decompressed/title.ratings.json", cnv, 0644)
+	err := ioutil.WriteFile("./files/json/title.ratings.json", cnv, 0644)
 	if err!=nil{
 		fmt.Println(err)
 	}
 }
-/*WriteRatings does ...*/
+/*WriteCrew does ...*/
 func WriteCrew(csvData [][]string){
 	start:=time.Now()
-
 	data:=make([][3]interface{},len(csvData))
 	for index, each := range csvData {
 	   data[index][0]=each[0]
@@ -81,16 +76,15 @@ func WriteCrew(csvData [][]string){
 	fmt.Println("Processing ", len(csvData)," data took ",time.Since(start))
 	crew=crew[1:]
 	cnv,_:=json.Marshal(crew)
-	err := ioutil.WriteFile("./files/decompressed/title.crew.json", cnv, 0644)
+	err := ioutil.WriteFile("./files/json/title.crew.json", cnv, 0644)
 	if err!=nil{
 		fmt.Println(err)
 	}
 }
+/*WriteNameBasics does ...*/
 func WriteNameBasics(csvData [][]string){
 	start:=time.Now()
-	
 	data:=make([][6]interface{},len(csvData))
-	//data=csvData
 	count:=0
 	for index, each := range csvData {
 		count++
@@ -105,7 +99,7 @@ func WriteNameBasics(csvData [][]string){
 	    data[index][3]=deathYear
 	    data[index][4]=strings.Split(each[4],",")
 	    data[index][5]=strings.Split(each[5],",")
-   }
+    }
 	items:=make([]model.NameBasics,len(data))
 	for index, each := range data {		
 		items[index].ID= each[0]
@@ -118,28 +112,19 @@ func WriteNameBasics(csvData [][]string){
 	fmt.Println("Processing ", len(csvData)," data took ",time.Since(start))
 	items=items[1:]
 	cnv,_:=json.Marshal(items)
-	err := ioutil.WriteFile("./files/decompressed/name.basics.json", cnv, 0644)
+	err := ioutil.WriteFile("./files/json/name.basics.json", cnv, 0644)
 	if err!=nil{
 		fmt.Println(err)
 	}
 }
+/*PrintData does..*/
 func PrintData(csvData [][]string){
-	fmt.Println(csvData[4499257][0])
-	// data:=make([][3]interface{},len(csvData))
-	// count:=0
-	// for index,_ := range csvData {
-	// 	// fmt.Println(index)
-	// 	count++
-	// }
-	// fmt.Println(csvData[4499257][0])
-	// for i:=0;i<20;i++{
-	// 	fmt.Println(data[i])
-	// }
+
 }
 /*ReadTSV does ...*/
-func ReadTSV(target string) {
+func ReadTSV(directory, target string) {
 	start:=time.Now()
-	csvFile, err := os.Open(target)
+	csvFile, err := os.Open(directory+target)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -158,13 +143,19 @@ func ReadTSV(target string) {
 	}
 	elasped:=time.Since(start)
 
-	//WriteRatings(csvData)
-	// WriteTitleBasics(csvData)
-	//  WriteCrew(csvData)
-	 WriteNameBasics(csvData)
-	// PrintData(csvData)
-	// fmt.Println(csvData[4499257])
+
+	switch target {
+	case "name.basics.tsv":
+		WriteNameBasics(csvData)
+	case "title.ratings.tsv":
+		WriteRatings(csvData)
+	case "title.crew.tsv":
+		WriteCrew(csvData)
+	case "title.basics.tsv":
+		WriteTitleBasics(csvData)
+	default:
+		panic("Unexpected error: couldn't locate file")
+	}
 	fmt.Println("Reading data took ",elasped)
 	fmt.Println("Data length: ",len(csvData))
-	
 }
