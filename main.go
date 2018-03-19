@@ -5,7 +5,8 @@ import (
     "time"
     "github.com/ashik112/goimdb/downloader"
     "github.com/ashik112/goimdb/decompresser"
-    "github.com/ashik112/goimdb/reader"
+    _"github.com/ashik112/goimdb/reader"
+    "github.com/ashik112/goimdb/httpreq"
 )
 
 /*DownloadFiles does..*/
@@ -50,16 +51,40 @@ func GetFiles(){
 
 /*ReadFile does..*/
 func ReadFile(){
-    directory:="./files/decompressed/"
+    // directory:="./files/decompressed/"
     // reader.ReadTSV(directory,"title.crew.tsv")
     // reader.ReadTSV(directory,"title.basics.tsv")
     // reader.ReadTSV(directory,"title.crew.tsv")
     // reader.ReadTSV(directory,"name.basics.tsv")
-    reader.ReadTSV(directory,"title.principals.tsv")
-}
+    // reader.ReadTSV(directory,"title.principals.tsv")
 
+}
+func CreateSolrFields(){
+    directory:="./files/json/"
+    doneTitles:=make(chan bool)
+    go httpreq.CreateSolrFields("localhost",8983,"test",directory+"field_titles.json",doneTitles)
+    // donePersons:=make(chan bool)
+    // go httpreq.CreateSolrFields("localhost",8983,"persons",directory+"field_persons.json",donePersons)
+    <-doneTitles
+    // <-donePersons
+}
+func UploadSolrData(){
+    directory:="./files/decompressed/"
+    doneRatings:=make(chan bool)
+    go httpreq.UploadDoc("localhost",8983,"test",directory+"title.ratings.tsv",doneRatings)
+    // donePersons:=make(chan bool)   
+    // go httpreq.UploadDoc("localhost",8983,"persons",directory+"name.basics.tsv",donePersons)
+    // doneTitles:=make(chan bool)
+    // go httpreq.UploadDoc("localhost",8983,"test",directory+"title.basics.tsv",doneTitles)
+    <- doneRatings
+    // <- donePersons
+    // <- doneTitles
+}
 func main() {
     // DownloadFiles()
     // GetFiles()
-      ReadFile()    
+    // ReadFile()    
+    // CreateSolrFields()
+    UploadSolrData()
+   
 }

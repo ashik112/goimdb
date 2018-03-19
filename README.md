@@ -48,14 +48,14 @@ $ curl -X POST -H 'Content-type:application/json' --data-binary '{
   },
   "add-field": {
     "name": "birthYear",
-    "type": "pint",
+    "type": "string",
     "stored": true,
     "indexed": true,
     "docValues": true
   },
   "add-field": {
     "name": "deathYear",
-    "type": "pint",
+    "type": "string",
     "stored": true,
     "indexed": true,
     "docValues": true

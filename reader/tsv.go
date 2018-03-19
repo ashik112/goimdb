@@ -218,7 +218,8 @@ func PrintData(path string) {
 
 /*ReadTSV does ...*/
 func ReadTSV(directory, target string) {
-	PrintData(directory + target)
+	// PrintData(directory + target)
+	// httpreq.UploadDoc("localhost",8983,"ratings",directory+target)
 
 	// start:=time.Now()
 	// csvFile, err := os.Open(directory+target)
