@@ -58,7 +58,7 @@ func UploadDoc(hostname string, port int, core string,path string,done chan bool
 		fmt.Println(err)
 	}
 	fmt.Println("Uploading file to solr...")
-	url:="http://"+hostname+":"+strconv.Itoa(port)+"/solr/"+core+"/update?commit=true&separator=%09&escape=%5c&trim=true"
+	url:="http://"+hostname+":"+strconv.Itoa(port)+"/solr/"+core+"/update?commit=true&separator=%09&escape=%5c&trim=true&commitWithin=120000"
 	fmt.Println("URL:>",url) 
 	req,err:=http.NewRequest("POST",url,bytes.NewBuffer(data))
 	req.Header.Set("Content-Type", "application/csv")
