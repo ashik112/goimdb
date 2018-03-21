@@ -1,13 +1,14 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"net/url"
 	"os"
+	"strconv"
+	"strings"
 	"time"
-    "strconv"
-    "net/url"
-    "strings"
-    "bufio"
+
 	"github.com/ashik112/goimdb/decompresser"
 	"github.com/ashik112/goimdb/downloader"
 	"github.com/ashik112/goimdb/gosolr"
@@ -126,31 +127,29 @@ func CMD(args []string) {
 	}
 }
 
+func Search(){
+	start := time.Now()
+	fmt.Print("Enter Movie title: ")
+	reader := bufio.NewReader(os.Stdin)
+	title, _ := reader.ReadString('\n')
+	fmt.Println(title)
+	title = `"` + title + `"`
+	titleType := `"` + "movie" + `"`
+	q := "primaryTitle:" + title + "AND titleType:" + titleType
+	t := &url.URL{Fragment: q}
+	q = strings.Trim(t.String(), "#")
+	gosolr.DeleteAll("localhost", 8983, "imdb")
+	CreateSolrFields()
+	UploadSolrData()
+	url := "http://" + "localhost" + ":" + strconv.Itoa(8983) + "/solr/" + "imdb" + "/select?q=" + q
+	gosolr.Get(url)
+	fmt.Println("... took ", time.Since(start))
+}
 func main() {
-    start := time.Now()
+	
+	// gosolr.DeleteAll("localhost", 8983, "imdb")
+	// UploadSolrData()
 	// DownloadFiles()
 	// GetFiles()
-    // ReadFile()
-    // var title string
-    fmt.Print("Enter Movie title: ")
-
-    // fmt.Scan(&title)
-    reader := bufio.NewReader(os.Stdin)
-    title, _ := reader.ReadString('\n')
-    fmt.Println(title)
-
-
-
-    title=`"`+title+`"`
-    titleType:=`"`+"movie"+`"`
-    q:="primaryTitle:"+title+"AND titleType:"+titleType
-    t := &url.URL{Fragment: q}
-	q = strings.Trim(t.String(),"#")
-	// gosolr.DeleteAll("localhost", 8983, "imdb")
-	// CreateSolrFields()
-    // UploadSolrData()
-    url:="http://"+"localhost"+":"+strconv.Itoa(8983)+"/solr/"+"imdb"+"/select?q="+q
-    gosolr.Get(url)
-	fmt.Println("... took ", time.Since(start))
-
+	Search()
 }
