@@ -11,7 +11,6 @@ goimdb uses a number of open source projects to work properly:
 * [Solr] 
 
 ### Installation
-
 goimdb is go-gettable. The follwing command will download the full project:
 
 ```sh
@@ -19,12 +18,17 @@ $ go get github.com/ashik112/goimb
 ```
 
 ### Solr
+In Solr, a core needs be created for goimdb to work.
+
 Create core:
 ```sh
 $ solr create -c imdb
 ```
 
-### Current Status : under-development
+### Current Status :
+Partially Complete: Download, Decompression, Data insertion in Solr
+Under-development & testing: API, User Input
+
 At this stage of development, goimdb only downloads and extracts the necessary files and certain folders need to be created on the root directory of the project.
 
 ```sh
@@ -33,7 +37,7 @@ At this stage of development, goimdb only downloads and extracts the necessary f
     files/decompressed
     files/json
 ```
-In Solr, a core needs be created for goimdb to work. The following command will insert/update Solr database at core "imdb".
+File download, decompression, data insertion are managed by goimdb. Some parts of the project are hard-coded which will be refactored and fixed soon.
 
 License
 ----
