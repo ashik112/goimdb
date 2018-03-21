@@ -6,6 +6,9 @@ import(
 	"strconv"
 	"bytes"
 	"io/ioutil"
+	"github.com/rtt/Go-Solr"
+	"strings"
+	"net/url"
 )
 
 func DeleteAll(hostname string, port int, core string){
@@ -74,4 +77,41 @@ func UploadDoc(hostname string, port int, core string,path string,done chan bool
     body, _ := ioutil.ReadAll(resp.Body)
 	fmt.Println("response Body:", string(body))
 	done <- true
+}
+func Get(url string){
+	fmt.Println("URL:>",url) 
+    resp, err := http.Get(url)
+    if err != nil {
+        panic(err)
+	}
+	defer resp.Body.Close()
+
+    fmt.Println("response Status:", resp.Status)
+    fmt.Println("response Headers:", resp.Header)
+    body, _ := ioutil.ReadAll(resp.Body)
+	fmt.Println("response Body:", string(body))
+}
+func SelectRaw(){
+	conn,err:=solr.Init("localhost",8983,"imdb")
+	if err!=nil{
+
+	}
+	q:="q=primaryTitle:'Black Panther'"
+	t := &url.URL{Fragment: q}
+	q = strings.Trim(t.String(),"#")
+	fmt.Println(q)
+	res, err := conn.SelectRaw(q)
+	if err != nil {
+		
+	}
+	fmt.Println(res)
+	results:=res.Results
+	for i := 0; i < results.Len(); i++ {
+	
+		fmt.Println("ID:", results.Get(i).Field("tconst")," primaryTitle:", results.Get(i).Field("primaryTitle"))
+	
+
+		fmt.Println("")
+	}
+
 }
