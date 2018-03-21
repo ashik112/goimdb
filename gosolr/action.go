@@ -1,4 +1,4 @@
-package httpreq
+package gosolr
 
 import(
 	"net/http"
