@@ -28,7 +28,8 @@ $ solr create -c imdb
 ### Current Status :
 
 <Partially Complete: Download, Decompression, Data insertion in Solr> 
-<Under-development: & testing: API, User Input>
+
+<Under-development & Testing: API, User Input>
 
 At this stage of development, goimdb only downloads and extracts the necessary files and certain folders need to be created on the root directory of the project.
 
