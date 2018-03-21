@@ -42,21 +42,20 @@ $ curl -X POST -H 'Content-type:application/json' --data-binary '{
   },
   "add-field": {
     "name": "primaryName",
+    "type": "text_general",
+    "stored": true,
+    "indexed": true
+  },
+  "add-field": {
+    "name": "birthYear",
     "type": "string",
     "stored": true,
     "indexed": true,
     "docValues": true
   },
   "add-field": {
-    "name": "birthYear",
-    "type": "pint",
-    "stored": true,
-    "indexed": true,
-    "docValues": true
-  },
-  "add-field": {
     "name": "deathYear",
-    "type": "pint",
+    "type": "string",
     "stored": true,
     "indexed": true,
     "docValues": true
@@ -76,7 +75,86 @@ $ curl -X POST -H 'Content-type:application/json' --data-binary '{
     "indexed": true,
     "docValues": true,
     "multiValued": true
-  }
+  },
+  "add-field": {
+    "name": "titleType",
+    "type": "string",
+    "stored": true,
+    "indexed": true,
+    "docValues": true
+  },
+  "add-field": {
+    "name": "primaryTitle",
+    "type": "text_general",
+    "stored": true,
+    "indexed": true
+  },
+  "add-field": {
+    "name": "originalTitle",
+    "type": "text_general",
+    "stored": true,
+    "indexed": true
+  },
+  "add-field": {
+    "name": "isAdult",
+    "type": "pint",
+    "stored": true,
+    "indexed": true,
+    "docValues": true
+  },
+  "add-field": {
+    "name": "startYear",
+    "type": "pint",
+    "stored": true,
+    "indexed": true,
+    "docValues": true
+  },
+  "add-field": {
+    "name": "endYear",
+    "type": "pint",
+    "stored": true,
+    "indexed": true,
+    "docValues": true
+  },
+  "add-field": {
+    "name": "runtimeMinutes",
+    "type": "pint",
+    "stored": true,
+    "indexed": true,
+    "docValues": true
+  },
+  "add-field": {
+    "name": "genres",
+    "type": "string",
+    "stored": true,
+    "indexed": true,
+    "docValues": true,
+    "multiValued": true
+  },
+  "add-field": {
+    "name": "directors",
+    "type": "string",
+    "stored": true,
+    "indexed": true,
+    "docValues": true,
+    "multiValued": true
+  },
+  "add-field": {
+    "name": "writers",
+    "type": "string",
+    "stored": true,
+    "indexed": true,
+    "docValues": true,
+    "multiValued": true
+  }    ,
+  "add-field": {
+    "name": "principalCast",
+    "type": "string",
+    "stored": true,
+    "indexed": true,
+    "docValues": true,
+    "multiValued": true
+  }  
 }' http://localhost:8983/solr/imdb/schema
 ```
 
@@ -95,6 +173,12 @@ In Solr, a core needs be created and field names should be manually created for 
 
 ```sh
 $ curl 'http://localhost:8983/solr/imdb/update?commit=true' -H 'Content-type:application/json' --data-binary @title.ratings.json
+```
+
+Sample search query:
+
+```sh
+http://localhost:8983/solr/imdb/select?q=averageRating:[8 TO *] AND numVotes:[20000 TO *] AND titleType:"movie"&rows=20&sort=numVotes desc
 ```
 Most of the process will be automated in the future.
 
