@@ -28,7 +28,6 @@ func DownloadFiles() {
 /*GetFiles does ...*/
 func GetFiles() {
 	startDecompress := time.Now()
-
 	doneRatings := make(chan int)
 	donePrincipals := make(chan int)
 	doneEpisode := make(chan int)
@@ -54,28 +53,14 @@ func GetFiles() {
 	fmt.Println("Decompression Process took ", elsapsedDecompress)
 }
 
-/*ReadFile does..*/
-func ReadFile() {
-	// directory:="./files/decompressed/"
-	// reader.ReadTSV(directory,"title.crew.tsv")
-	// reader.ReadTSV(directory,"title.basics.tsv")
-	// reader.ReadTSV(directory,"title.crew.tsv")
-	// reader.ReadTSV(directory,"name.basics.tsv")
-	// reader.ReadTSV(directory,"title.principals.tsv")
-
-}
 func CreateSolrFields() {
 	directory := "./files/json/"
 	doneTitles := make(chan bool)
 	go gosolr.CreateSolrFields("localhost", 8983, "imdb", directory+"all_fields.json", doneTitles)
-	// donePersons:=make(chan bool)
-	// go gosolr.CreateSolrFields("localhost",8983,"persons",directory+"field_persons.json",donePersons)
 	<-doneTitles
-	// <-donePersons
 }
 func UploadSolrData() {
 	directory := "./files/decompressed/"
-
 	start := time.Now()
 	donePrincipals := make(chan bool)
 	go gosolr.UploadDoc("localhost", 8983, "imdb", directory+"title.principals.tsv", donePrincipals)
