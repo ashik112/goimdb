@@ -122,12 +122,14 @@ func SearchMovie() {
 	fmt.Print("Enter Movie title: ")
 	reader := bufio.NewReader(os.Stdin)
 	title, _ := reader.ReadString('\n')
+	title = strings.Trim(title, "\n")
 	title = `"` + title + `"`
 	titleType := `"` + "movie" + `"`
 	q := "primaryTitle:" + title + "AND titleType:" + titleType
 	t := &url.URL{Fragment: q}
 	q = strings.Trim(t.String(), "#")
-	url := "http://" + SolrConfig.Hostname + ":" + strconv.Itoa(SolrConfig.Port) + "/solr/" + SolrConfig.Core + "/select?q=" + q+"&rows=50"//&sort=startYear%20desc
+	url := "http://" + SolrConfig.Hostname + ":" + strconv.Itoa(SolrConfig.Port) + "/solr/" + SolrConfig.Core + "/select?q=" + q+"&rows=5"
+	fmt.Println(url)
 	gosolr.GetTitle(url)
 	fmt.Println("... took ", time.Since(start))
 }
