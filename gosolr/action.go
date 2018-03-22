@@ -2,15 +2,18 @@ package gosolr
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"net/url"
+	_ "net/url"
 	"strconv"
-	"strings"
+	_ "strings"
 
-	"github.com/rtt/Go-Solr"
+	"github.com/ashik112/goimdb/model"
 )
+
+var SolrConfig = model.Solr{"localhost", 8983, "imdb"}
 
 func DeleteAll(hostname string, port int, core string) {
 	url := "http://" + hostname + ":" + strconv.Itoa(port) + "/solr/" + core + "/update?commit=true"
@@ -79,36 +82,117 @@ func UploadDoc(hostname string, port int, core string, path string, done chan bo
 	fmt.Println("response Body:", string(body))
 	done <- true
 }
-func Get(url string) {
-	fmt.Println("URL:>", url)
-	resp, err := http.Get(url)
+func GetTitle(Url string) {
+	resp, err := http.Get(Url)
 	if err != nil {
 		panic(err)
 	}
 	defer resp.Body.Close()
 
-	fmt.Println("response Status:", resp.Status)
-	fmt.Println("response Headers:", resp.Header)
+	// fmt.Println("response Status:", resp.Status)
+	// fmt.Println("response Headers:", resp.Header)
 	body, _ := ioutil.ReadAll(resp.Body)
-	fmt.Println("response Body:", string(body))
+	var data model.Titles
+	err = json.Unmarshal(body, &data)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("\nSearch Results: (Found ", data.Response.NumFound, ")")
+	fmt.Println("=====================================================================================================================================================================================")
+	for _, item := range data.Response.Docs {
+
+		getRating := make(chan bool)
+		getCast := make(chan bool)
+
+		fmt.Println("Title: ", item.PrimaryTitle[0], "\t||\t Type: ", item.TitleType, "\t||\t Year: ", item.StartYear, "\t||\t Genres: ", item.Genres, "\t||\t Runtime: ", item.RuntimeMinutes, " minutes")
+		go GetRating(item.Tconst, getRating)
+		<-getRating
+		go GetCast(item.Tconst, getCast)
+
+		<-getCast
+
+		fmt.Println("=====================================================================================================================================================================================")
+	}
 }
-func SelectRaw() {
-	conn, err := solr.Init("localhost", 8983, "imdb")
-	if err != nil {
 
-	}
-	q := "q=primaryTitle:'Black Panther'"
-	t := &url.URL{Fragment: q}
-	q = strings.Trim(t.String(), "#")
-	fmt.Println(q)
-	res, err := conn.SelectRaw(q)
+func GetRating(tconst string, done chan bool) {
+	q := "tconst:" + `%22` + tconst + `%22`
+	fq := "{!join%20from=averageRating%20to=averageRating}" + "tconst:" + `%22` + tconst + `%22`
+	// t := &url.URL{Fragment: fq}
+	// fq = strings.Trim(t.String(), "#")
+	Url := "http://" + SolrConfig.Hostname + ":" + strconv.Itoa(SolrConfig.Port) + "/solr/" + SolrConfig.Core + "/select?q=" + q + "&fq=" + fq
+	resp, err := http.Get(Url)
 	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
 
+	// fmt.Println("response Status:", resp.Status)
+	// fmt.Println("response Headers:", resp.Header)
+	body, _ := ioutil.ReadAll(resp.Body)
+	var data model.Ratings
+	err = json.Unmarshal(body, &data)
+	if err != nil {
+		panic(err)
 	}
-	fmt.Println(res)
-	results := res.Results
-	for i := 0; i < results.Len(); i++ {
-		fmt.Println("ID:", results.Get(i).Field("tconst"), " primaryTitle:", results.Get(i).Field("primaryTitle"))
-		fmt.Println("")
+	// fmt.Println(data)
+	for _, item := range data.Response.Docs {
+		fmt.Println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
+		fmt.Println("Rating: ", item.AverageRating, "\t||\t Votes: ", item.NumVotes)
 	}
+	done <- true
+}
+
+func GetCast(tconst string, done chan bool) {
+	q := "tconst:" + `"` + tconst + `"`
+	fq := "{!join%20from=nconst%20to=nconst}" + "tconst:" + `%22` + tconst + `%22`
+	// t := &url.URL{Fragment: fq}
+	// fq = strings.Trim(t.String(), "#")
+	Url := "http://" + SolrConfig.Hostname + ":" + strconv.Itoa(SolrConfig.Port) + "/solr/" + SolrConfig.Core + "/select?q=" + q + "&fq=" + fq + "&sort=ordering%20asc"
+	resp, err := http.Get(Url)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+
+	// fmt.Println("response Status:", resp.Status)
+	// fmt.Println("response Headers:", resp.Header)
+	body, _ := ioutil.ReadAll(resp.Body)
+	var data model.Cast
+	err = json.Unmarshal(body, &data)
+	if err != nil {
+		panic(err)
+	}
+	// fmt.Println(data)
+	for _, item := range data.Response.Docs {
+		fmt.Println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
+		fmt.Println("Sl: ", item.Ordering, "\t||\t Cast: ", GetCastName(item.Nconst), "\t||\t Category: ", item.Category, "\t||\t Job: ", item.Job, "\t||\t Characters: ", item.Characters)
+	}
+	done <- true
+}
+
+func GetCastName(id string) string {
+	q := "nconst:" + `%22` + id + `%22`
+	fq := "{!join%20from=primaryName%20to=primaryName}" + "nconst:" + `%22` + id + `%22`
+	// t := &url.URL{Fragment: fq}
+	// fq = strings.Trim(t.String(), "#")
+	URL := "http://" + SolrConfig.Hostname + ":" + strconv.Itoa(SolrConfig.Port) + "/solr/" + SolrConfig.Core + "/select?q=" + q + "&fq=" + fq + "&fl=primaryName"
+	resp, err := http.Get(URL)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+	body, _ := ioutil.ReadAll(resp.Body)
+	var data model.Person
+	err = json.Unmarshal(body, &data)
+	if err != nil {
+		panic(err)
+	}
+	// fmt.Println(data)
+	return data.Response.Docs[0].PrimaryName[0]
+	// for _, item := range data.Response.Docs {
+	// 	return item.PrimaryName[0]
+	// }
+	// return ""
 }

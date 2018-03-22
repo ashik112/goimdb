@@ -43,12 +43,12 @@ func GetFiles() {
 	doneCrew := make(chan int)
 	doneTitleBasics := make(chan int)
 	doneNameBasics := make(chan int)
-	go decompresser.UnGzip(ArchivePath+GzipFile.Title, DecompressedPath, doneTitleBasics)
-	go decompresser.UnGzip(ArchivePath+GzipFile.Ratings, DecompressedPath, doneRatings)
-	go decompresser.UnGzip(ArchivePath+GzipFile.People, DecompressedPath, donePrincipals)
-	go decompresser.UnGzip(ArchivePath+GzipFile.Persons, DecompressedPath, doneNameBasics)
-	go decompresser.UnGzip(ArchivePath+GzipFile.Crew, DecompressedPath, doneCrew)
-	go decompresser.UnGzip(ArchivePath+GzipFile.Episode, DecompressedPath, doneEpisode)
+	go decompresser.UnGzip(ArchivePath+GzipFile.Title, DecompressedPath+GzipFile.Title, doneTitleBasics)
+	go decompresser.UnGzip(ArchivePath+GzipFile.Ratings, DecompressedPath+GzipFile.Ratings, doneRatings)
+	go decompresser.UnGzip(ArchivePath+GzipFile.People, DecompressedPath+GzipFile.People, donePrincipals)
+	go decompresser.UnGzip(ArchivePath+GzipFile.Persons, DecompressedPath+GzipFile.Persons, doneNameBasics)
+	go decompresser.UnGzip(ArchivePath+GzipFile.Crew, DecompressedPath+GzipFile.Crew, doneCrew)
+	go decompresser.UnGzip(ArchivePath+GzipFile.Episode, DecompressedPath+GzipFile.Episode, doneEpisode)
 	<-doneRatings
 	<-donePrincipals
 	<-doneEpisode
@@ -102,7 +102,7 @@ func contains(arr []string, str string) bool {
 func CMD(args []string) {
 	switch {
 	case contains(os.Args[1:], "update"):
-		gosolr.DeleteAll("localhost", 8983, "imdb")
+		gosolr.DeleteAll(SolrConfig.Hostname, SolrConfig.Port, SolrConfig.Core)
 		UploadSolrData()
 	case contains(os.Args[1:], "insert"):
 		UploadSolrData()
@@ -116,32 +116,27 @@ func CMD(args []string) {
 	}
 }
 
-func Search() {
+func SearchMovie() {
 	start := time.Now()
 
 	fmt.Print("Enter Movie title: ")
 	reader := bufio.NewReader(os.Stdin)
 	title, _ := reader.ReadString('\n')
-	fmt.Println(title)
 	title = `"` + title + `"`
 	titleType := `"` + "movie" + `"`
 	q := "primaryTitle:" + title + "AND titleType:" + titleType
 	t := &url.URL{Fragment: q}
 	q = strings.Trim(t.String(), "#")
-	url := "http://" + SolrConfig.Hostname + ":" + strconv.Itoa(SolrConfig.Port) + "/solr/" + SolrConfig.Core + "/select?q=" + q
-	gosolr.Get(url)
-
+	url := "http://" + SolrConfig.Hostname + ":" + strconv.Itoa(SolrConfig.Port) + "/solr/" + SolrConfig.Core + "/select?q=" + q+"&rows=50"//&sort=startYear%20desc
+	gosolr.GetTitle(url)
 	fmt.Println("... took ", time.Since(start))
 }
 
-func Init() {
-
-}
 func main() {
 
 	// gosolr.DeleteAll("localhost", 8983, "imdb")
 	// UploadSolrData()
 	// DownloadFiles()
 	// GetFiles()
-	Search()
+	SearchMovie()
 }
