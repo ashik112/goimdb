@@ -15,14 +15,14 @@ import (
 	"github.com/ashik112/goimdb/model"
 )
 
-var FilePath="./files/"
-var ArchivePath=FilePath+"archive/"
-var DecompressedPath=FilePath+"decompressed/"
-var JsonPath=FilePath+"json/"
-var GzipFile=model.Files{"title.basics.tsv.gz","title.ratings.tsv.gz","title.principals.tsv.gz","name.basics.tsv.gz","title.crew.tsv.gz","title.episode.tsv.gz"}
-var TsvFile=model.Files{"title.basics.tsv","title.ratings.tsv","title.principals.tsv","name.basics.tsv","title.crew.tsv","title.episode.tsv"}
-var SolrConfig=model.Solr{"localhost",8983,"imdb"}
-var Imdb=model.Imdb{"https://datasets.imdbws.com/"}
+var FilePath = "./files/"
+var ArchivePath = FilePath + "archive/"
+var DecompressedPath = FilePath + "decompressed/"
+var JsonPath = FilePath + "json/"
+var GzipFile = model.Files{"title.basics.tsv.gz", "title.ratings.tsv.gz", "title.principals.tsv.gz", "name.basics.tsv.gz", "title.crew.tsv.gz", "title.episode.tsv.gz"}
+var TsvFile = model.Files{"title.basics.tsv", "title.ratings.tsv", "title.principals.tsv", "name.basics.tsv", "title.crew.tsv", "title.episode.tsv"}
+var SolrConfig = model.Solr{"localhost", 8983, "imdb"}
+var Imdb = model.Imdb{"https://datasets.imdbws.com/"}
 
 /*DownloadFiles does..*/
 func DownloadFiles() {
@@ -118,7 +118,7 @@ func CMD(args []string) {
 
 func Search() {
 	start := time.Now()
-	
+
 	fmt.Print("Enter Movie title: ")
 	reader := bufio.NewReader(os.Stdin)
 	title, _ := reader.ReadString('\n')
@@ -134,8 +134,8 @@ func Search() {
 	fmt.Println("... took ", time.Since(start))
 }
 
-func Init(){
-	
+func Init() {
+
 }
 func main() {
 

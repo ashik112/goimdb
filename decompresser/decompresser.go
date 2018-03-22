@@ -1,22 +1,21 @@
 package decompresser
 
 import (
-	"log"
 	"compress/gzip"
 	"io"
+	"log"
 	"os"
-	"path/filepath"
-	"time"
 	"path"
+	"path/filepath"
 	"strings"
+	"time"
 )
 
 /*UnGzip does...*/
 func UnGzip(source, target string, done chan int) {
-	start:=time.Now()
-	log.Println("Decompressing ",source)
-	
-	
+	start := time.Now()
+	log.Println("Decompressing ", source)
+
 	file := path.Base(source)
 
 	reader, err := os.Open(source)
@@ -32,7 +31,7 @@ func UnGzip(source, target string, done chan int) {
 	defer archive.Close()
 
 	// target = filepath.Join(target, archive.Name)
-	archiveName:=strings.Replace(file,".gz","",-1)
+	archiveName := strings.Replace(file, ".gz", "", -1)
 	target = filepath.Join(target, archiveName)
 	// log.Println(target)
 	writer, err := os.Create(target)
@@ -42,11 +41,11 @@ func UnGzip(source, target string, done chan int) {
 	defer writer.Close()
 
 	_, err = io.Copy(writer, archive)
-	if err!=nil{
+	if err != nil {
 		log.Println(err)
 	}
 
-	elapsed:=time.Since(start)
-	log.Println("Decompressed ",archiveName," in ",elapsed)
+	elapsed := time.Since(start)
+	log.Println("Decompressed ", archiveName, " in ", elapsed)
 	done <- 1
 }
