@@ -12,17 +12,26 @@ import (
 	"github.com/ashik112/goimdb/decompresser"
 	"github.com/ashik112/goimdb/downloader"
 	"github.com/ashik112/goimdb/gosolr"
+	"github.com/ashik112/goimdb/model"
 )
+
+var FilePath="./files/"
+var ArchivePath=FilePath+"archive/"
+var DecompressedPath=FilePath+"decompressed/"
+var JsonPath=FilePath+"json/"
+var GzipFile=model.Files{"title.basics.tsv.gz","title.ratings.tsv.gz","title.principals.tsv.gz","name.basics.tsv.gz","title.crew.tsv.gz","title.episode.tsv.gz"}
+var TsvFile=model.Files{"title.basics.tsv","title.ratings.tsv","title.principals.tsv","name.basics.tsv","title.crew.tsv","title.episode.tsv"}
+var SolrConfig=model.Solr{"localhost",8983,"imdb"}
+var Imdb=model.Imdb{"https://datasets.imdbws.com/"}
 
 /*DownloadFiles does..*/
 func DownloadFiles() {
-	downloader.Download("./files/archive", "https://datasets.imdbws.com/title.ratings.tsv.gz")
-	downloader.Download("./files/archive", "https://datasets.imdbws.com/title.principals.tsv.gz")
-	downloader.Download("./files/archive", "https://datasets.imdbws.com/title.episode.tsv.gz")
-	downloader.Download("./files/archive", "https://datasets.imdbws.com/title.crew.tsv.gz")
-	downloader.Download("./files/archive", "https://datasets.imdbws.com/title.basics.tsv.gz")
-	downloader.Download("./files/archive", "https://datasets.imdbws.com/title.akas.tsv.gz")
-	downloader.Download("./files/archive", "https://datasets.imdbws.com/name.basics.tsv.gz")
+	downloader.Download(ArchivePath, Imdb.URL+GzipFile.Title)
+	downloader.Download(ArchivePath, Imdb.URL+GzipFile.Ratings)
+	downloader.Download(ArchivePath, Imdb.URL+GzipFile.Persons)
+	downloader.Download(ArchivePath, Imdb.URL+GzipFile.Crew)
+	downloader.Download(ArchivePath, Imdb.URL+GzipFile.People)
+	downloader.Download(ArchivePath, Imdb.URL+GzipFile.Episode)
 }
 
 /*GetFiles does ...*/
@@ -33,55 +42,50 @@ func GetFiles() {
 	doneEpisode := make(chan int)
 	doneCrew := make(chan int)
 	doneTitleBasics := make(chan int)
-	doneAkas := make(chan int)
 	doneNameBasics := make(chan int)
-	go decompresser.UnGzip("./files/archive/title.ratings.tsv.gz", "./files/decompressed", doneRatings)
-	go decompresser.UnGzip("./files/archive/title.principals.tsv.gz", "./files/decompressed", donePrincipals)
-	go decompresser.UnGzip("./files/archive/title.episode.tsv.gz", "./files/decompressed", doneEpisode)
-	go decompresser.UnGzip("./files/archive/title.crew.tsv.gz", "./files/decompressed", doneCrew)
-	go decompresser.UnGzip("./files/archive/title.basics.tsv.gz", "./files/decompressed", doneTitleBasics)
-	go decompresser.UnGzip("./files/archive/title.akas.tsv.gz", "./files/decompressed", doneAkas)
-	go decompresser.UnGzip("./files/archive/name.basics.tsv.gz", "./files/decompressed", doneNameBasics)
+	go decompresser.UnGzip(ArchivePath+GzipFile.Title, DecompressedPath, doneTitleBasics)
+	go decompresser.UnGzip(ArchivePath+GzipFile.Ratings, DecompressedPath, doneRatings)
+	go decompresser.UnGzip(ArchivePath+GzipFile.People, DecompressedPath, donePrincipals)
+	go decompresser.UnGzip(ArchivePath+GzipFile.Persons, DecompressedPath, doneNameBasics)
+	go decompresser.UnGzip(ArchivePath+GzipFile.Crew, DecompressedPath, doneCrew)
+	go decompresser.UnGzip(ArchivePath+GzipFile.Episode, DecompressedPath, doneEpisode)
 	<-doneRatings
 	<-donePrincipals
 	<-doneEpisode
 	<-doneCrew
 	<-doneTitleBasics
-	<-doneAkas
 	<-doneNameBasics
 	elsapsedDecompress := time.Since(startDecompress)
 	fmt.Println("Decompression Process took ", elsapsedDecompress)
 }
 
 func CreateSolrFields() {
-	directory := "./files/json/"
 	doneTitles := make(chan bool)
-	go gosolr.CreateSolrFields("localhost", 8983, "imdb", directory+"all_fields.json", doneTitles)
+	go gosolr.CreateSolrFields(SolrConfig.Hostname, SolrConfig.Port, SolrConfig.Core, JsonPath+"all_fields.json", doneTitles)
 	<-doneTitles
 }
 func UploadSolrData() {
-	directory := "./files/decompressed/"
 	start := time.Now()
 	donePrincipals := make(chan bool)
-	go gosolr.UploadDoc("localhost", 8983, "imdb", directory+"title.principals.tsv", donePrincipals)
+	go gosolr.UploadDoc(SolrConfig.Hostname, SolrConfig.Port, SolrConfig.Core, DecompressedPath+TsvFile.People, donePrincipals)
 	<-donePrincipals
 	fmt.Println("Uploading Principals took ", time.Since(start))
 
 	donePersons := make(chan bool)
-	go gosolr.UploadDoc("localhost", 8983, "imdb", directory+"name.basics.tsv", donePersons)
+	go gosolr.UploadDoc(SolrConfig.Hostname, SolrConfig.Port, SolrConfig.Core, DecompressedPath+TsvFile.Persons, donePersons)
 	<-donePersons
 
 	doneRatings := make(chan bool)
-	go gosolr.UploadDoc("localhost", 8983, "imdb", directory+"title.ratings.tsv", doneRatings)
+	go gosolr.UploadDoc(SolrConfig.Hostname, SolrConfig.Port, SolrConfig.Core, DecompressedPath+TsvFile.Ratings, doneRatings)
 	doneCrew := make(chan bool)
-	go gosolr.UploadDoc("localhost", 8983, "imdb", directory+"title.crew.tsv", doneCrew)
+	go gosolr.UploadDoc(SolrConfig.Hostname, SolrConfig.Port, SolrConfig.Core, DecompressedPath+TsvFile.Crew, doneCrew)
 	<-doneRatings
 	<-doneCrew
 
 	doneTitles := make(chan bool)
-	go gosolr.UploadDoc("localhost", 8983, "imdb", directory+"title.basics.tsv", doneTitles)
+	go gosolr.UploadDoc(SolrConfig.Hostname, SolrConfig.Port, SolrConfig.Core, DecompressedPath+TsvFile.Title, doneTitles)
 	doneEpisodes := make(chan bool)
-	go gosolr.UploadDoc("localhost", 8983, "imdb", directory+"title.episode.tsv", doneEpisodes)
+	go gosolr.UploadDoc(SolrConfig.Hostname, SolrConfig.Port, SolrConfig.Core, DecompressedPath+TsvFile.Episode, doneEpisodes)
 	<-doneTitles
 	<-doneEpisodes
 }
@@ -112,8 +116,9 @@ func CMD(args []string) {
 	}
 }
 
-func Search(){
+func Search() {
 	start := time.Now()
+	
 	fmt.Print("Enter Movie title: ")
 	reader := bufio.NewReader(os.Stdin)
 	title, _ := reader.ReadString('\n')
@@ -123,15 +128,17 @@ func Search(){
 	q := "primaryTitle:" + title + "AND titleType:" + titleType
 	t := &url.URL{Fragment: q}
 	q = strings.Trim(t.String(), "#")
-	gosolr.DeleteAll("localhost", 8983, "imdb")
-	CreateSolrFields()
-	UploadSolrData()
-	url := "http://" + "localhost" + ":" + strconv.Itoa(8983) + "/solr/" + "imdb" + "/select?q=" + q
+	url := "http://" + SolrConfig.Hostname + ":" + strconv.Itoa(SolrConfig.Port) + "/solr/" + SolrConfig.Core + "/select?q=" + q
 	gosolr.Get(url)
+
 	fmt.Println("... took ", time.Since(start))
 }
-func main() {
+
+func Init(){
 	
+}
+func main() {
+
 	// gosolr.DeleteAll("localhost", 8983, "imdb")
 	// UploadSolrData()
 	// DownloadFiles()
