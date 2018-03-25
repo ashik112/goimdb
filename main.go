@@ -13,7 +13,7 @@ import (
 	"github.com/ashik112/goimdb/downloader"
 	"github.com/ashik112/goimdb/gosolr"
 	"github.com/ashik112/goimdb/model"
-	_"github.com/ashik112/goimdb/reader"
+	_ "github.com/ashik112/goimdb/reader"
 )
 
 var FilePath = "./files/"
