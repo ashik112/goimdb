@@ -121,10 +121,11 @@ func GetTitle(Url string) {
 	}
 
 	fmt.Println("\nSearch Results: (Found ", data.Response.NumFound, ")")
-	fmt.Println("=====================================================================================================================================================================================")
+	fmt.Println("=======================================================================================================================================================================================================================")
 	for i, item := range data.Response.Docs {
 
-		fmt.Println("Sl: ", i+1, "|| Title: ", item.PrimaryTitle[0], "\t||\t Type: ", item.TitleType, "\t||\t Year: ", item.StartYear, "\t||\t Genres: ", item.Genres, "\t||\t Runtime: ", item.RuntimeMinutes, " minutes")
+		fmt.Print("Sl: ", i+1, "\t||\t Title: ", item.PrimaryTitle[0], "\t||\t Type: ", item.TitleType, "\t||\t Year: ", item.StartYear, "\t||\t Genres: ", item.Genres, "\t||\t Runtime: ", item.RuntimeMinutes, " minutes \t||\t")
+		fmt.Println("Rating: ", item.AverageRating,"\t||\t Votes: ",item.NumVotes)
 		// getRating := make(chan bool)
 		// getCast := make(chan bool)
 		// go GetRating(item.Tconst, getRating)
@@ -133,7 +134,7 @@ func GetTitle(Url string) {
 
 		// <-getCast
 
-		fmt.Println("=====================================================================================================================================================================================")
+		fmt.Println("========================================================================================================================================================================================================================")
 	}
 }
 
