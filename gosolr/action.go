@@ -57,6 +57,28 @@ func CreateSolrFields(hostname string, port int, core string, path string, done 
 	fmt.Println("response Body:", string(body))
 	done <- true
 }
+
+func Update(data []interface{}) {
+	url := "http://" + "localhost" + ":" + "8983" + "/solr/" + "imdb" + "/update?autoCommit=true&commitWithin=10000"
+	jsonStr, err := json.Marshal(data)
+	if err != nil {
+		fmt.Println(err)
+	}
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
+	req.Header.Set("Content-Type", "application/json")
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer resp.Body.Close()
+
+	fmt.Println("response Status:", resp.Status)
+	fmt.Println("response Headers:", resp.Header)
+	body, _ := ioutil.ReadAll(resp.Body)
+	fmt.Println("response Body:", string(body))
+}
+
 func UploadDoc(hostname string, port int, core string, path string, done chan bool) {
 	// DeleteAll(hostname,port,core)
 
@@ -102,24 +124,23 @@ func GetTitle(Url string) {
 	fmt.Println("=====================================================================================================================================================================================")
 	for i, item := range data.Response.Docs {
 
-		getRating := make(chan bool)
-		getCast := make(chan bool)
+		fmt.Println("Sl: ", i+1, "|| Title: ", item.PrimaryTitle[0], "\t||\t Type: ", item.TitleType, "\t||\t Year: ", item.StartYear, "\t||\t Genres: ", item.Genres, "\t||\t Runtime: ", item.RuntimeMinutes, " minutes")
+		// getRating := make(chan bool)
+		// getCast := make(chan bool)
+		// go GetRating(item.Tconst, getRating)
+		// <-getRating
+		// go GetCast(item.Tconst, getCast)
 
-		fmt.Println("Sl: ",i+1,"|| Title: ", item.PrimaryTitle[0], "\t||\t Type: ", item.TitleType, "\t||\t Year: ", item.StartYear, "\t||\t Genres: ", item.Genres, "\t||\t Runtime: ", item.RuntimeMinutes, " minutes")
-		go GetRating(item.Tconst, getRating)
-		<-getRating
-		go GetCast(item.Tconst, getCast)
-
-		<-getCast
+		// <-getCast
 
 		fmt.Println("=====================================================================================================================================================================================")
 	}
 }
 
 func GetRating(tconst string, done chan bool) {
-	q := "tconst:" + `%22` + tconst + `%22`+"%20AND%20averageRating:[0%20TO%2010]"
+	q := "tconst:" + `%22` + tconst + `%22` + "%20AND%20averageRating:[0%20TO%2010]"
 	// fq := "{!join%20from=averageRating%20to=averageRating}" + "tconst:" + `%22` + tconst + `%22`
-	Url := "http://" + SolrConfig.Hostname + ":" + strconv.Itoa(SolrConfig.Port) + "/solr/" + SolrConfig.Core + "/select?q=" + q 
+	Url := "http://" + SolrConfig.Hostname + ":" + strconv.Itoa(SolrConfig.Port) + "/solr/" + SolrConfig.Core + "/select?q=" + q
 	resp, err := http.Get(Url)
 	if err != nil {
 		panic(err)
@@ -140,7 +161,7 @@ func GetRating(tconst string, done chan bool) {
 }
 
 func GetCast(tconst string, done chan bool) {
-	q := "tconst:" + `%22` + tconst + `%22`+"%20AND%20category:*"
+	q := "tconst:" + `%22` + tconst + `%22` + "%20AND%20category:*"
 	resp, err := http.Get("http://" + SolrConfig.Hostname + ":" + strconv.Itoa(SolrConfig.Port) + "/solr/" + SolrConfig.Core + "/select?q=" + q + "&sort=ordering%20asc")
 	if err != nil {
 		panic(err)
@@ -148,7 +169,7 @@ func GetCast(tconst string, done chan bool) {
 	defer resp.Body.Close()
 
 	body, _ := ioutil.ReadAll(resp.Body)
-	
+
 	var data model.Cast
 	err = json.Unmarshal(body, &data)
 	if err != nil {
@@ -156,16 +177,16 @@ func GetCast(tconst string, done chan bool) {
 	}
 	for _, item := range data.Response.Docs {
 		fmt.Println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
-		fmt.Print(GetCastName(item.Nconst), "\t||\t ", item.Category,"\t\t ", item.Characters)
+		fmt.Print(GetCastName(item.Nconst), "\t||\t ", item.Category, "\t\t ", item.Characters)
 		fmt.Println("")
 	}
 	done <- true
 }
 
-func GetCastName(id string) string{
-	q := "nconst:" + `%22` + id + `%22`+"%20AND%20primaryName:*"
+func GetCastName(id string) string {
+	q := "nconst:" + `%22` + id + `%22` + "%20AND%20primaryName:*"
 
-	resp, err := http.Get("http://" + SolrConfig.Hostname + ":" + strconv.Itoa(SolrConfig.Port) + "/solr/" + SolrConfig.Core + "/select?q=" + q +"&fl=primaryName")
+	resp, err := http.Get("http://" + SolrConfig.Hostname + ":" + strconv.Itoa(SolrConfig.Port) + "/solr/" + SolrConfig.Core + "/select?q=" + q + "&fl=primaryName")
 	if err != nil {
 		panic(err)
 	}

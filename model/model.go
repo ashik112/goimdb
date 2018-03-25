@@ -28,9 +28,9 @@ type Titles struct {
 			PrimaryTitle   []string `json:"primaryTitle"`
 			OriginalTitle  []string `json:"originalTitle"`
 			IsAdult        int      `json:"isAdult"`
-			StartYear      string   `json:"startYear"`
-			EndYear        string   `json:"endYear"`
-			RuntimeMinutes string   `json:"runtimeMinutes"`
+			StartYear      int   `json:"startYear"`
+			EndYear        int   `json:"endYear"`
+			RuntimeMinutes int   `json:"runtimeMinutes"`
 			Genres         string   `json:"genres"`
 			ID             string   `json:"id"`
 			Version        int64    `json:"_version_"`

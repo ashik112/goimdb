@@ -13,6 +13,7 @@ import (
 	"github.com/ashik112/goimdb/downloader"
 	"github.com/ashik112/goimdb/gosolr"
 	"github.com/ashik112/goimdb/model"
+	"github.com/ashik112/goimdb/reader"
 )
 
 var FilePath = "./files/"
@@ -124,11 +125,11 @@ func SearchMovie() {
 	title, _ := reader.ReadString('\n')
 	title = strings.Trim(title, "\n")
 	title = `"` + title + `"`
-	titleType := `"` + "movie" + `"`
+	titleType := `"` + "short" + `"`
 	q := "primaryTitle:" + title + "AND titleType:" + titleType
 	t := &url.URL{Fragment: q}
 	q = strings.Trim(t.String(), "#")
-	url := "http://" + SolrConfig.Hostname + ":" + strconv.Itoa(SolrConfig.Port) + "/solr/" + SolrConfig.Core + "/select?q=" + q+"&rows=5"
+	url := "http://" + SolrConfig.Hostname + ":" + strconv.Itoa(SolrConfig.Port) + "/solr/" + SolrConfig.Core + "/select?q=" + q + "&rows=5"
 	fmt.Println(url)
 	gosolr.GetTitle(url)
 	fmt.Println("... took ", time.Since(start))
@@ -137,8 +138,11 @@ func SearchMovie() {
 func main() {
 
 	// gosolr.DeleteAll("localhost", 8983, "imdb")
+	// CreateSolrFields()
 	// UploadSolrData()
 	// DownloadFiles()
 	// GetFiles()
-	SearchMovie()
+	// SearchMovie()
+	reader.ReadTSV("./files/decompressed/", "title.basics.tsv")
+
 }

@@ -34,21 +34,21 @@
     },
     "add-field": {
         "name": "startYear",
-        "type": "string",
+        "type": "pint",
         "stored": true,
         "indexed": true,
         "docValues": true
     },
     "add-field": {
         "name": "endYear",
-        "type": "string",
+        "type": "pint",
         "stored": true,
         "indexed": true,
         "docValues": true
     },
     "add-field": {
         "name": "runtimeMinutes",
-        "type": "string",
+        "type": "pint",
         "stored": true,
         "indexed": true,
         "docValues": true
