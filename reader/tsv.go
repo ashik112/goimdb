@@ -48,7 +48,7 @@ func InsertTitleRatings(path string) {
 				},
 			},
 		}
-		gosolr.Update(item)
+		gosolr.Update(item, "localhost", 8983, "imdb")
 	}
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
@@ -106,7 +106,7 @@ func InsertTitleBasics(path string) {
 				},
 			},
 		}
-		gosolr.Update(item)
+		gosolr.Update(item, "localhost", 8983, "imdb")
 	}
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
@@ -123,7 +123,7 @@ func InsertTitlePrincipals(path string) {
 	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
 		row := strings.Split(scanner.Text(), "\t")
-		ordering, err := strconv.ParseFloat(row[1], 64)
+		ordering, err := strconv.Atoi(row[1])
 		if err != nil {
 			ordering = 0
 		}
@@ -136,7 +136,52 @@ func InsertTitlePrincipals(path string) {
 				"characters": row[5],
 			},
 		}
-		gosolr.Update(item)
+		gosolr.Update(item, "localhost", 8983, "cast")
+	}
+	if err := scanner.Err(); err != nil {
+		log.Fatal(err)
+	}
+}
+
+/*InsertNameBasics does..*/
+func InsertNameBasics(path string) {
+	f, err := os.Open(path)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer f.Close()
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		row := strings.Split(scanner.Text(), "\t")
+		birthYear, err := strconv.Atoi(row[2])
+		if err != nil {
+			birthYear = 0
+		}
+		deathYear, err := strconv.Atoi(row[3])
+		if err != nil {
+			deathYear = 0
+		}
+		item := []interface{}{
+			map[string]interface{}{
+				"id": row[0],
+				"primaryName": map[string]interface{}{
+					"set": row[1],
+				},
+				"birthYear": map[string]interface{}{
+					"set": birthYear,
+				},
+				"deathYear": map[string]interface{}{
+					"set": deathYear,
+				},
+				"primaryProfession": map[string]interface{}{
+					"set": row[4],
+				},
+				"knownForTitles": map[string]interface{}{
+					"set": row[5],
+				},
+			},
+		}
+		gosolr.Update(item, "localhost", 8983, "person")
 	}
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
@@ -147,7 +192,9 @@ func InsertTitlePrincipals(path string) {
 func ReadTSV(directory, target string) {
 	start := time.Now()
 	// InsertTitleBasics(directory + target)
-	InsertTitleRatings(directory + target)
+	// InsertTitleRatings(directory + target)
+	// InsertTitlePrincipals(directory + target)
+	InsertNameBasics(directory + target)
 	fmt.Println("... took ", time.Since(start))
 	// start:=time.Now()
 	// csvFile, err := os.Open(directory+target)

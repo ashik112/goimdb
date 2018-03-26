@@ -12,6 +12,7 @@ type Solr struct {
 	Hostname string
 	Port     int
 	Core     string
+	CastCore string
 }
 
 type Imdb struct {
