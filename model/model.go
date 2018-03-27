@@ -89,7 +89,7 @@ type Person struct {
 		NumFound int `json:"numFound"`
 		Start    int `json:"start"`
 		Docs     []struct {
-			Nconst            string   `json:"nconst"`
+			//Nconst            string   `json:"nconst"`
 			PrimaryName       []string `json:"primaryName"`
 			BirthYear         string   `json:"birthYear"`
 			DeathYear         string   `json:"deathYear"`

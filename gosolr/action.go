@@ -59,7 +59,7 @@ func CreateSolrFields(hostname string, port int, core string, path string, done 
 }
 
 func Update(data []interface{}, hostname string, port int, core string) {
-	url := "http://" + hostname + ":" + strconv.Itoa(port) + "/solr/" + core + "/update?autoCommit=true&commitWithin=120000"
+	url := "http://" + hostname + ":" + strconv.Itoa(port) + "/solr/" + core + "/update?autoCommit=true&commitWithin=600000"
 	jsonStr, err := json.Marshal(data)
 	if err != nil {
 		fmt.Println(err)
@@ -120,45 +120,18 @@ func GetTitle(Url string) {
 		panic(err)
 	}
 
-	fmt.Println("\nSearch Results: (Found ", data.Response.NumFound, ")")
-	fmt.Println("===============================================================================================================================================================================================")
+	fmt.Println("\nSearch Results: (Found ", data.Response.NumFound, ")\n")
+	// fmt.Println("=============> Basic Info <=============")
 	for i, item := range data.Response.Docs {
 
-		fmt.Print("Sl: ", i+1," id: ",item.ID, "\t||\t Title: ", item.PrimaryTitle[0], "\t||\t Type: ", item.TitleType, "\t||\t Year: ", item.StartYear, "\t||\t Genres: ", item.Genres, "\t||\t Runtime: ", item.RuntimeMinutes, " minutes \t||\t")
+		fmt.Print("Sl: ", i+1, "\t||\t imdbID: ", item.ID, "\t||\t Title: ", item.PrimaryTitle[0], "\t||\t Type: ", item.TitleType, "\t||\t Year: ", item.StartYear, "\t||\t Genres: ", item.Genres, "\n\nRuntime: ", item.RuntimeMinutes, " minutes \t||\t")
 		fmt.Println("Rating: ", item.AverageRating, "\t||\t Votes: ", item.NumVotes)
-		// getRating := make(chan bool)
 		getCast := make(chan bool)
-		// go GetRating(item.Tconst, getRating)
-		// <-getRating
+		fmt.Println("\n=============> Casts <=============\n")
 		go GetCast(item.ID, getCast)
-
 		<-getCast
-
-		fmt.Println("===============================================================================================================================================================================================")
+		fmt.Println("\n===============================================================================================================================================================================================\n")
 	}
-}
-
-func GetRating(tconst string, done chan bool) {
-	q := "tconst:" + `%22` + tconst + `%22` + "%20AND%20averageRating:[0%20TO%2010]"
-	// fq := "{!join%20from=averageRating%20to=averageRating}" + "tconst:" + `%22` + tconst + `%22`
-	Url := "http://" + SolrConfig.Hostname + ":" + strconv.Itoa(SolrConfig.Port) + "/solr/" + SolrConfig.Core + "/select?q=" + q
-	resp, err := http.Get(Url)
-	if err != nil {
-		panic(err)
-	}
-	defer resp.Body.Close()
-
-	body, _ := ioutil.ReadAll(resp.Body)
-	var data model.Ratings
-	err = json.Unmarshal(body, &data)
-	if err != nil {
-		panic(err)
-	}
-	for _, item := range data.Response.Docs {
-		fmt.Println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
-		fmt.Println("\t Rating: ", item.AverageRating, "\t||\t Votes: ", item.NumVotes)
-	}
-	done <- true
 }
 
 func GetCast(tconst string, done chan bool) {
@@ -177,17 +150,17 @@ func GetCast(tconst string, done chan bool) {
 		panic(err)
 	}
 	for _, item := range data.Response.Docs {
-		fmt.Println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
-		fmt.Print(item.Nconst, "\t||\t ", item.Category, "\t||\t ", item.Characters)
-		fmt.Println("")
+		// fmt.Println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
+		fmt.Println(GetCastName(item.Nconst), "\t||\t ", item.Category, "\t||\t ", item.Characters)
+		// fmt.Println("")
 	}
 	done <- true
 }
 
 func GetCastName(id string) string {
-	q := "nconst:" + `%22` + id + `%22` + "%20AND%20primaryName:*"
+	q := "id:" + `%22` + id + `%22` //+ "%20AND%20primaryName:*"
 
-	resp, err := http.Get("http://" + SolrConfig.Hostname + ":" + strconv.Itoa(SolrConfig.Port) + "/solr/" + SolrConfig.Core + "/select?q=" + q + "&fl=primaryName")
+	resp, err := http.Get("http://" + SolrConfig.Hostname + ":" + strconv.Itoa(SolrConfig.Port) + "/solr/" + "person" + "/select?q=" + q) //+ "&fl=primaryName")
 	if err != nil {
 		panic(err)
 	}
