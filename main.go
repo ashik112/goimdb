@@ -13,7 +13,7 @@ import (
 	"github.com/ashik112/goimdb/downloader"
 	"github.com/ashik112/goimdb/gosolr"
 	"github.com/ashik112/goimdb/model"
-	_"github.com/ashik112/goimdb/reader"
+	_ "github.com/ashik112/goimdb/reader"
 )
 
 var FilePath = "./files/"
@@ -22,7 +22,7 @@ var DecompressedPath = FilePath + "decompressed/"
 var JsonPath = FilePath + "json/"
 var GzipFile = model.Files{"title.basics.tsv.gz", "title.ratings.tsv.gz", "title.principals.tsv.gz", "name.basics.tsv.gz", "title.crew.tsv.gz", "title.episode.tsv.gz"}
 var TsvFile = model.Files{"title.basics.tsv", "title.ratings.tsv", "title.principals.tsv", "name.basics.tsv", "title.crew.tsv", "title.episode.tsv"}
-var SolrConfig = model.Solr{"localhost", 8983, "imdb", "cast"}
+var SolrConfig = model.Solr{"localhost", 8983, "imdb_title", "imdb_cast", "imdb_person"}
 var Imdb = model.Imdb{"https://datasets.imdbws.com/"}
 
 /*DownloadFiles does..*/
@@ -60,9 +60,9 @@ func GetFiles() {
 	fmt.Println("Decompression Process took ", elsapsedDecompress)
 }
 
-func CreateSolrFields(hostname string, port int, core string) {
+func CreateSolrFields(hostname string, port int, core string, filename string) {
 	doneTitles := make(chan bool)
-	go gosolr.CreateSolrFields(hostname, port, core, JsonPath+"all_fields.json", doneTitles)
+	go gosolr.CreateSolrFields(hostname, port, core, JsonPath+filename, doneTitles)
 	<-doneTitles
 }
 func UploadSolrData() {
@@ -110,7 +110,7 @@ func CMD(args []string) {
 	case contains(os.Args[1:], "init"):
 		DownloadFiles()
 		GetFiles()
-		CreateSolrFields(SolrConfig.Hostname, SolrConfig.Port, SolrConfig.Core)
+		CreateSolrFields(SolrConfig.Hostname, SolrConfig.Port, SolrConfig.Core, "all_fields.json")
 		UploadSolrData()
 	default:
 		fmt.Println("No valid param found")
@@ -135,13 +135,19 @@ func SearchMovie() {
 }
 
 func main() {
+	// reader.ReadTSV("./files/decompressed/", "title.principals.tsv")
 	// gosolr.DeleteAll("localhost", 8983, "imdb")
-	// CreateSolrFields(SolrConfig.Hostname, SolrConfig.Port, "person")
+	// gosolr.DeleteAll("localhost", 8983, "imdb_title")
+	// gosolr.DeleteAll("localhost", 8983, "imdb_person")
+	// gosolr.DeleteAll("localhost", 8983, "imdb_cast")
+	// CreateSolrFields(SolrConfig.Hostname, SolrConfig.Port, "imdb")
+	// CreateSolrFields(SolrConfig.Hostname, SolrConfig.Port, "imdb_title","title_fields.json")
+	// CreateSolrFields(SolrConfig.Hostname, SolrConfig.Port, "imdb_person","person_fields.json")
+	// CreateSolrFields(SolrConfig.Hostname, SolrConfig.Port, "imdb_cast","cast_fields.json")
 	// DownloadFiles()
 	// GetFiles()
 	// reader.ReadTSV("./files/decompressed/", "title.basics.tsv")
 	// reader.ReadTSV("./files/decompressed/", "title.ratings.tsv")
-	// reader.ReadTSV("./files/decompressed/", "title.principals.tsv")
 	// reader.ReadTSV("./files/decompressed/", "name.basics.tsv")
 	SearchMovie()
 }

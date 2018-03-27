@@ -48,7 +48,7 @@ func InsertTitleRatings(path string) {
 				},
 			},
 		}
-		gosolr.Update(item, "localhost", 8983, "imdb")
+		gosolr.Update(item, "localhost", 8983, "imdb_title")
 	}
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
@@ -106,7 +106,7 @@ func InsertTitleBasics(path string) {
 				},
 			},
 		}
-		gosolr.Update(item, "localhost", 8983, "imdb")
+		gosolr.Update(item, "localhost", 8983, "imdb_title")
 	}
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
@@ -136,7 +136,7 @@ func InsertTitlePrincipals(path string) {
 				"characters": row[5],
 			},
 		}
-		gosolr.Update(item, "localhost", 8983, "cast")
+		gosolr.Update(item, "localhost", 8983, "imdb_cast")
 	}
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
@@ -181,7 +181,7 @@ func InsertNameBasics(path string) {
 				},
 			},
 		}
-		gosolr.Update(item, "localhost", 8983, "person")
+		gosolr.Update(item, "localhost", 8983, "imdb_person")
 	}
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
@@ -194,6 +194,7 @@ func ReadTSV(directory, target string) {
 	// InsertTitleBasics(directory + target)
 	// InsertTitleRatings(directory + target)
 	// InsertTitlePrincipals(directory + target)
+	// InsertTitleBasics(directory + target)
 	InsertNameBasics(directory + target)
 	fmt.Println("... took ", time.Since(start))
 	// start:=time.Now()

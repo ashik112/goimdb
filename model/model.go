@@ -13,6 +13,7 @@ type Solr struct {
 	Port     int
 	Core     string
 	CastCore string
+	PersonCore string
 }
 
 type Imdb struct {

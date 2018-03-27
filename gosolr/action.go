@@ -13,7 +13,7 @@ import (
 	"github.com/ashik112/goimdb/model"
 )
 
-var SolrConfig = model.Solr{"localhost", 8983, "imdb", "cast"}
+var SolrConfig = model.Solr{"localhost", 8983, "imdb_title", "imdb_cast", "imdb_person"}
 
 func DeleteAll(hostname string, port int, core string) {
 	url := "http://" + hostname + ":" + strconv.Itoa(port) + "/solr/" + core + "/update?commit=true"
@@ -59,7 +59,7 @@ func CreateSolrFields(hostname string, port int, core string, path string, done 
 }
 
 func Update(data []interface{}, hostname string, port int, core string) {
-	url := "http://" + hostname + ":" + strconv.Itoa(port) + "/solr/" + core + "/update?autoCommit=true&commitWithin=600000"
+	url := "http://" + hostname + ":" + strconv.Itoa(port) + "/solr/" + core + "/update?autoCommit=true&commitWithin=2000"
 	jsonStr, err := json.Marshal(data)
 	if err != nil {
 		fmt.Println(err)
@@ -135,7 +135,7 @@ func GetTitle(Url string) {
 }
 
 func GetCast(tconst string, done chan bool) {
-	q := "tconst:" + `%22` + tconst + `%22` + "%20AND%20category:*"
+	q := "tconst:" + `%22` + tconst + `%22` //+ "%20AND%20category:*"
 	resp, err := http.Get("http://" + SolrConfig.Hostname + ":" + strconv.Itoa(SolrConfig.Port) + "/solr/" + SolrConfig.CastCore + "/select?q=" + q + "&sort=ordering%20asc")
 	if err != nil {
 		panic(err)
@@ -149,6 +149,7 @@ func GetCast(tconst string, done chan bool) {
 	if err != nil {
 		panic(err)
 	}
+	// fmt.Println(data)
 	for _, item := range data.Response.Docs {
 		// fmt.Println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
 		fmt.Println(GetCastName(item.Nconst), "\t||\t ", item.Category, "\t||\t ", item.Characters)
@@ -160,16 +161,20 @@ func GetCast(tconst string, done chan bool) {
 func GetCastName(id string) string {
 	q := "id:" + `%22` + id + `%22` //+ "%20AND%20primaryName:*"
 
-	resp, err := http.Get("http://" + SolrConfig.Hostname + ":" + strconv.Itoa(SolrConfig.Port) + "/solr/" + "person" + "/select?q=" + q) //+ "&fl=primaryName")
+	resp, err := http.Get("http://" + SolrConfig.Hostname + ":" + strconv.Itoa(SolrConfig.Port) + "/solr/" + SolrConfig.PersonCore + "/select?q=" + q) //+ "&fl=primaryName")
 	if err != nil {
 		panic(err)
 	}
 	defer resp.Body.Close()
-	body, _ := ioutil.ReadAll(resp.Body)
+	body, err:= ioutil.ReadAll(resp.Body)
+	if err!=nil{
+		return ""
+	}
 	var data model.Person
 	err = json.Unmarshal(body, &data)
-	if err != nil {
-		panic(err)
+	if err != nil|| len(data.Response.Docs) <= 0 {
+		return ""
 	}
+	
 	return data.Response.Docs[0].PrimaryName[0]
 }
