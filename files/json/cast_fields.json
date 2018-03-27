@@ -1,0 +1,44 @@
+{
+    "add-field": {
+        "name": "tconst",
+        "type": "string",
+        "stored": true,
+        "indexed": true,
+        "docValues": true
+    },
+    "add-field": {
+        "name": "nconst",
+        "type": "string",
+        "stored": true,
+        "indexed": true,
+        "docValues": true
+    },
+    "add-field": {
+        "name": "ordering",
+        "type": "pint",
+        "stored": true,
+        "indexed": true,
+        "docValues": true
+    },
+    "add-field": {
+        "name": "category",
+        "type": "string",
+        "stored": true,
+        "indexed": true,
+        "docValues": true
+    },
+    "add-field": {
+        "name": "job",
+        "type": "string",
+        "stored": true,
+        "indexed": true,
+        "docValues": true
+    },
+    "add-field": {
+        "name": "characters",
+        "type": "string",
+        "stored": true,
+        "indexed": true,
+        "docValues": true
+    }
+}
