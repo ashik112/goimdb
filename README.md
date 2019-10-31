@@ -1,4 +1,4 @@
-# goimdb
+# goimdb (On-Hold)
 IMDB movie database using Golang (only for personal and non-commercial use)
 
 goimdb downloads data from datasets.imdbws.com, currently provided by imdb. These are the subsets of IMDb data that are available for personal and non-commercial use. Each dataset is gzipped, TSV (tab-separated-values) formatted file. The first line of each file contains headers.
